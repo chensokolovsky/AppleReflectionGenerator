@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🍎 Apple Reflection Generator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #0b1220;
+      --text: #e5e7eb;
+      --border: #2b3442;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 800px at 50% -100px, #1e293b 0%, var(--bg) 40%);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+    .app { width: 100%; max-width: 1000px; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    header { padding: 16px 20px; background: rgba(2,6,23,0.6); border-bottom: 1px solid var(--border); display: grid; place-items: center; }
+    h1 { font-size: 20px; margin: 0; font-weight: 800; text-align: center; }
+    .control-stack { display: grid; gap: 14px; padding: 16px 20px 8px 20px; justify-items: center; }
+    .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .label { font-size: 13px; opacity: .85; text-transform: lowercase; min-width: 170px; text-align: right; }
+
+    .segmented { display: inline-flex; background: #f6f7f9; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+    .segmented button {
+      appearance: none; background: #000; border: none; padding: 10px 14px; font-size: 13px; color: #fff;
+      cursor: pointer; transition: background .15s ease, color .15s ease; border-right: 1px solid #e5e7eb;
+    }
+    .segmented button:last-child { border-right: 0; }
+    .segmented button.active { background: cyan; color: #000; }
+    .segmented button:focus-visible { outline: 2px solid #06b6d4; outline-offset: 2px; }
+
+    .text-input { background: #f6f7f9; color: #111827; border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px 12px; font-size: 13px; min-width: 420px; max-width: 640px; }
+    .code-wrap { padding: 8px 20px 4px 20px; }
+    pre { margin: 0; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: 13px; line-height: 1.5; min-height: 160px; position: relative; }
+    .lang-tag { position: absolute; top: 8px; right: 10px; font-family: var(--mono); font-size: 11px; opacity: 0.7; }
+    .footer { padding: 12px 20px 18px 20px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn { appearance: none; background: #111827; color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; cursor: pointer; }
+    .btn:hover { border-color: #60a5fa; }
+    .key { font-family: var(--mono); font-size: 12px; opacity: .8; }
+    @media (max-width: 720px) {
+      .label { text-align: left; min-width: auto; }
+      .row { flex-direction: column; align-items: stretch; }
+      .text-input { min-width: auto; width: 100%; }
+    }
+
+    #codeFuncSig {
+      min-height: 80px; /* or 0 if you want it to shrink to fit content */
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <header><h1>🍎 Apple Reflection Generator 🍎 </h1></header>
+
+      <div class="control-stack">
+        <div class="row"><div class="label">language:</div><div id="slot-language"></div></div>
+        <div class="row"><div class="label">method:</div><div id="slot-method"></div></div>
+        <div class="row"><div class="label">class creation:</div><div id="slot-creation"></div></div>
+        <div class="row"><div class="label">selector creation:</div><div id="slot-selector"></div></div>
+        <div class="row"><div class="label">return value:</div><div id="slot-return"></div></div>
+        <div class="row"><div class="label">number of parameters:</div><div id="slot-numparams"></div></div>
+        <div class="row" id="row-paramtypes" style="display:none;"><div class="label">parameter types:</div><div id="slot-paramtypes"></div></div>
+        <div class="row"><div class="label">triggering method:</div><div id="slot-trigger"></div></div>
+        <div class="row" id="imp-creation" style="display:none;"><div class="label">IMP creation:</div><div id="slot-impCreation"></div></div>
+
+      </div>
+
+      <div class="code-wrap">
+        <pre id="codeFuncSig"><code id="codeFuncSig">// Objc function decleration:</code><span class="lang-tag" id="langTag">objc</span></pre>
+      </div>
+
+      <div class="code-wrap">
+        <pre id="codeBlock"><code id="code">// Code output will appear here based on your selections.</code><span class="lang-tag" id="langTag">objc</span></pre>
+      </div>
+
+      <div class="footer">
+        <div class="key" id="activeKey"></div>
+        <button id="copyBtn" class="btn">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load the non-module snippets -->
+  <script src="triggering_snippets.js"></script>
+  <script src="decleration_and_test.js"></script>
+  <script src="snippets_full_global.js"></script>
+
+
+  <!-- index_ui_external_global.html -->
+
+  <script>
+    const { key, getSnippetByKey, getDeclerationByKey } = window.Snippets;
+
+    const state = {
+      language: "objc",
+      method: "class",
+      creation: "NSClassFromString",
+      instanceText: "id myInstance = [MyClass new];",
+      userEditedInstanceText: false,
+      selectorCreation: "@selector",
+      returnValue: "void",
+      numParams: "none",
+      paramTypes: "none",
+      triggeringMethod: "performSelector",
+      impCreation: "none"
+    };
+
+    function getDefaultInstanceText(lang) {
+      return lang === "swift" ? "let myInstance = MyClass()" : "id myInstance = [MyClass new];";
+    }
+
+    function makeSegmented(options, current, onSelect) {
+      const wrap = document.createElement("div");
+      wrap.className = "segmented";
+      options.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.value = opt.value;
+        btn.textContent = opt.label;
+        if (opt.value === current) btn.classList.add("active");
+        btn.addEventListener("click", () => {
+          wrap.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          onSelect(opt.value);
+        });
+        wrap.appendChild(btn);
+      });
+      return wrap;
+    }
+
+    function ensureValidSelection(options, current) {
+      const has = options.some(o => o.value === current);
+      return has ? current : (options[0] ? options[0].value : current);
+    }
+
+    function renderLanguage() {
+      const slot = document.getElementById("slot-language");
+      slot.innerHTML = "";
+      slot.appendChild(makeSegmented(
+        [{label:"objc", value:"objc"}, {label:"swift", value:"swift"}],
+        state.language,
+        (val) => {
+          state.language = val;
+          if (!state.userEditedInstanceText) state.instanceText = getDefaultInstanceText(val);
+          state.selectorCreation = (val === "swift") ? "Selector" : "NSSelectorFromString";
+          state.creation = "NSClassFromString";
+          state.triggeringMethod = (val === "swift") ? "perform" : "performSelector";
+          renderAll();
+        }
+      ));
+    }
+
+    function renderMethod() {
+      const slot = document.getElementById("slot-method");
+      slot.innerHTML = "";
+      slot.appendChild(makeSegmented(
+        [{label:"class", value:"class"}, {label:"instance", value:"instance"}],
+        state.method,
+        (val) => {
+          state.method = val;
+          if (val === "class") { state.creation = "NSClassFromString"; }
+          else if (!state.userEditedInstanceText) { state.instanceText = getDefaultInstanceText(state.language); }
+          renderCreationRow();
+          updateCode();
+        }
+      ));
+    }
+
+    function renderCreationRow() {
+      const slot = document.getElementById("slot-creation");
+      slot.innerHTML = "";
+      if (state.method === "class") {
+        slot.appendChild(makeSegmented(
+          [{label:"NSClassFromString", value:"NSClassFromString"}, {label:"objc_getClass", value:"objc_getClass"}],
+          state.creation,
+          (val) => { state.creation = val; updateCode(); }
+        ));
+      } else {
+        const input = document.createElement("input");
+        input.className = "text-input";
+        input.type = "text";
+        input.value = state.instanceText;
+        input.readOnly = true;   // <--- makes it non-editable
+        slot.appendChild(input);
+      }
+    }
+
+    function renderSelectorRow() {
+      const slot = document.getElementById("slot-selector");
+      slot.innerHTML = "";
+
+      var options = []
+
+      if (state.language === "objc") {
+        options.push({label:"@selector", value:"@selector"})
+        options.push({label:"NSSelectorFromString", value:"NSSelectorFromString"})
+        options.push({label:"sel_registerName", value:"sel_registerName"})
+      }
+      else {
+        options.push({label:"Selector", value:"Selector"})
+        options.push({label:"#selector", value:"#selector"})
+        options.push({label:"NSSelectorFromString", value:"NSSelectorFromString"})
+        options.push({label:"sel_registerName", value:"sel_registerName"})
+      }
+
+      state.selectorCreation = ensureValidSelection(options, state.selectorCreation);
+
+      slot.appendChild(makeSegmented(
+          options,
+          state.selectorCreation,
+          (val) => { state.selectorCreation = val; updateCode(); }
+        ));
+
+    }
+
+    function renderReturnValue() {
+      const slot = document.getElementById("slot-return");
+      slot.innerHTML = "";
+      slot.appendChild(makeSegmented(
+        [
+          {label:"void", value:"void"},
+          {label:"NSObject", value:"NSObject"},
+          {label:"BOOL", value:"BOOL"},
+          {label:"int", value:"int"},
+          {label:"float", value:"float"},
+          {label:"double", value:"double"}
+        ],
+        state.returnValue,
+        (val) => { state.returnValue = val; updateCode(); }
+      ));
+    }
+
+    function renderNumParams() {
+      const slot = document.getElementById("slot-numparams");
+      slot.innerHTML = "";
+      slot.appendChild(makeSegmented(
+        [
+          {label:"none", value:"none"},
+          {label:"one", value:"one"},
+          {label:"two", value:"two"},
+          {label:"three or more", value:"threePlus"}
+        ],
+        state.numParams,
+        (val) => {
+          state.numParams = val;
+          const row = document.getElementById("row-paramtypes");
+          row.style.display = (state.numParams === "none") ? "none" : "flex";
+          if (state.numParams === "none") state.paramTypes = "none";
+          renderParamTypes();
+          renderTriggerRow();
+          renderImpCreation();
+          updateCode();
+        }
+      ));
+      const row = document.getElementById("row-paramtypes");
+      row.style.display = (state.numParams === "none") ? "none" : "flex";
+      if (state.numParams === "none") state.paramTypes = "none";
+      renderParamTypes();
+    }
+
+    function renderParamTypes() {
+      const slot = document.getElementById("slot-paramtypes");
+      slot.innerHTML = "";
+      if (state.numParams !== "none") {
+        if (state.paramTypes === "none") state.paramTypes = "allNSObject";
+        slot.appendChild(makeSegmented(
+          [
+            {label:"All parameters are NSObject or nil", value:"allNSObject"},
+            {label:"One of the parameters is a C type (int/float/double)", value:"oneCType"}
+          ],
+          state.paramTypes,
+          (val) => { 
+            state.paramTypes = val;
+            updateCode();
+          }
+        ));
+      }
+    }
+
+    function renderImpCreation() {
+      const slot = document.getElementById("slot-impCreation");
+      slot.innerHTML = "";
+      const row = document.getElementById("imp-creation");
+      row.style.display = (state.triggeringMethod != "IMP") ? "none" : "flex";
+      
+      if (state.triggeringMethod === "IMP") {
+        if (state.impCreation === "none") state.impCreation = "methodForSel"
+        slot.appendChild(makeSegmented(
+          [
+            {label:"methodForSelector", value:"methodForSel"},
+            {label:"method_getImplementation", value:"method_getImpl"},
+            {label:"class_getMethodImplementation", value:"getMethodImpl"},
+
+          ],
+          state.impCreation,
+          (val) => {
+            state.impCreation = val;
+            updateCode(); 
+          }
+        ));
+      }
+    }
+
+
+    function renderTriggerRow() {
+      const slot = document.getElementById("slot-trigger");
+      slot.innerHTML = "";
+
+      var options = []
+      if (state.language === 'objc') {
+        if (state.numParams != 'threePlus') {
+          options.push({label:"performSelector", value:"performSelector"})
+        }
+        options.push({label:"NSInvocation", value:"NSInvocation"})
+        options.push({label:"IMP", value:"IMP"})
+        options.push({label:"objc_msgSend", value:"objc_msgSend"})
+        
+      }
+      else {
+
+        if (state.numParams != 'threePlus') {
+          options.push({label:"perform", value:"perform"})
+        }
+        options.push({label:"IMP", value:"IMP"})
+      }
+
+      state.triggeringMethod = ensureValidSelection(options, state.triggeringMethod);
+
+
+      slot.appendChild( makeSegmented(options, state.triggeringMethod,
+          (val) => { 
+            state.triggeringMethod = val;
+            const row = document.getElementById("imp-creation");
+            row.style.display = (state.triggeringMethod != "IMP") ? "none" : "flex";
+            renderImpCreation(); 
+            updateCode(); 
+          }));
+    }
+
+    function currentKey() {
+      return key(
+        state.language,
+        state.method,
+        state.method === "class" ? state.creation : "instanceInput",
+        state.selectorCreation,
+        state.returnValue,
+        state.numParams,
+        state.numParams === "none" ? "none" : state.paramTypes,
+        state.triggeringMethod,
+        state.impCreation
+      );
+    }
+
+    function updateCode() {
+      const k = currentKey();
+      let snippet = "";
+      try {
+        snippet = getSnippetByKey(k) || "";
+      } catch (e) {
+        console.error("getSnippetByKey failed", e);
+      }
+      const body = snippet && snippet.trim()
+        ? snippet
+        : `// TODO: Add code for this combination in snippets_full_global.js\n// (Search for the key and return your snippet)`;
+      document.getElementById("code").textContent = body;
+      document.getElementById("langTag").textContent = state.language;
+      document.getElementById("activeKey").textContent = k;
+
+      let decleration = "";
+      try {
+        decleration = getDeclerationByKey(k) || "";
+      } catch (e) {
+        console.error("getDeclerationByKey failed", e);
+      }
+      const dec = decleration && decleration.trim()
+        ? decleration
+        : "// TODO add decleration for this case";
+      document.getElementById("codeFuncSig").textContent = dec;
+      
+    }
+
+    function renderAll() {
+      renderLanguage();
+      renderMethod();
+      renderCreationRow();
+      renderSelectorRow();
+      renderReturnValue();
+      renderNumParams();
+      renderParamTypes();
+      renderTriggerRow();
+      renderImpCreation();
+      updateCode();
+    }
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(document.getElementById("code").textContent);
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
