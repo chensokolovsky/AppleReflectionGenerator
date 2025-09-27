@@ -6,11 +6,16 @@ A tool for generating code that utilizes reflection to trigger objc methods from
 
 
 ## Usage
+
+Visit the [webpage](https://chensokolovsky.github.io/AppleReflectionGenerator/tool/index.html)
+
+or run locally:
 ```
 $ git clone https://github.com/chensokolovsky/AppleReflectionGenerator.git
 $ cd AppleReflectionGenerator/tool
 $ open index.html
 ```
+
 Then, select the method to your liking/needs.
 Top code block shows a decleration and implementation you can copy and rename as needed, or copy as is into the fiftyWays project.  
 Bottom code block contains the code for trigerring the method with reflection
