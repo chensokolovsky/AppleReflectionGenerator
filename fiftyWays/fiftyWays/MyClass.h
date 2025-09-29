@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MyClass : NSObject
 
 // replace this with the decleration from the tool
-+(void)methodName;
+-(id) methodName;
 
 
 

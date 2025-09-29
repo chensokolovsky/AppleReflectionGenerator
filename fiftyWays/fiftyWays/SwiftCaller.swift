@@ -12,9 +12,11 @@ struct SwiftCaller {
         print("Swift caller called")
         
         /// Paste your Swift calls here:
-        
-        
-       
+        let myInstance = MyClass()
+        let mySelector = Selector("methodName")
+        if let result = myInstance.perform(mySelector)?.takeUnretainedValue() as? NSObject {
+            print("result: \(result)")
+        }        
         
         print("Swift caller finished")
         

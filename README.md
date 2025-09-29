@@ -17,11 +17,11 @@ $ open index.html
 ```
 
 Then, select the method to your liking/needs.
-Top code block shows a decleration and implementation you can copy and rename as needed, or copy as is into the fiftyWays project.  
+Top code block shows a decleration and implementation of the callee for testing. you can copy and rename as needed, or copy as is into the fiftyWays project.  
 Bottom code block contains the code for trigerring the method with reflection
 
 ## Read more
-In the blog post
+In the [blog post](https://chensokolovsky.github.io/FuzzerAmoreBlog/posts/FuzzerAmore.html)
 
 ## Fifty Ways App
 should be there after cloning ```AppleReflectionGenerator/fiftyWays```.  

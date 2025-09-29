@@ -20,9 +20,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MyClass
 
+
 // replace this with the implementation from the tool
-+(void)methodName {
-    NSLog(@"trigerred");
+-(id) methodName {
+    NSLog(@"method was triggered");
+    return @"ack";
 }
 
 @end
