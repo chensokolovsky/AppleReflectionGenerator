@@ -21,7 +21,7 @@ Top code block shows a decleration and implementation of the callee for testing.
 Bottom code block contains the code for trigerring the method with reflection
 
 ## Read more
-In the [blog post](https://chensokolovsky.github.io/FuzzerAmoreBlog/posts/FuzzerAmore.html)
+In the [blog post](https://chensokolovsky.github.io/FuzzerAmoreBlog/posts/apple_reflection_generator.html)
 
 ## Fifty Ways App
 should be there after cloning ```AppleReflectionGenerator/fiftyWays```.  
