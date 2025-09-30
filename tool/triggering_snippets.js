@@ -74,8 +74,8 @@
 
                 if (num === 'none') call += ');'
                 else if (num === 'one') call += ptypes === 'allNSObject' ? ', @"myFirstArg");' : ', 0.99);'
-                else if (num === 'two') call += ptypes === 'allNSObject' ? ', @"myFirstArg", @"mySecongArg");' : ', 0.99, @"mySecondArg");'
-                else if (num === 'threePlus') call += ptypes === 'allNSObject' ? ', @"myFirstArg", @"mySecongArg", @"myThirdArg");' : ', 0.99, @"mySecondArg", @"myThirdArg");'
+                else if (num === 'two') call += ptypes === 'allNSObject' ? ', @"myFirstArg", @"mySecondArg");' : ', 0.99, @"mySecondArg");'
+                else if (num === 'threePlus') call += ptypes === 'allNSObject' ? ', @"myFirstArg", @"mySecondArg", @"myThirdArg");' : ', 0.99, @"mySecondArg", @"myThirdArg");'
 
                 return call
 
@@ -127,8 +127,8 @@
         var call = 'myFunc(' + target + ', mySelector'
         if (num === 'none') call += ');'
         else if (num === 'one') call += ptypes === 'allNSObject' ? ', @"myFirstArg");' : ', 0.99);'
-        else if (num === 'two') call += ptypes === 'allNSObject' ? ', @"myFirstArg", @"mySecongArg");' : ', 0.99, @"mySecondArg");'
-        else if (num === 'threePlus') call += ptypes === 'allNSObject' ? ', @"myFirstArg", @"mySecongArg", @"myThirdArg");' : ', 0.99, @"mySecondArg", @"myThirdArg");'
+        else if (num === 'two') call += ptypes === 'allNSObject' ? ', @"myFirstArg", @"mySecondArg");' : ', 0.99, @"mySecondArg");'
+        else if (num === 'threePlus') call += ptypes === 'allNSObject' ? ', @"myFirstArg", @"mySecondArg", @"myThirdArg");' : ', 0.99, @"mySecondArg", @"myThirdArg");'
 
         return returnValueDef + call;
 
