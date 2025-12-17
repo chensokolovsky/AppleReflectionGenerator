@@ -94,7 +94,7 @@ const { buildDecleration, buildTest } = window.BuildDeclerationsAndTest;
       }
       else {
        if (creationChoice === 'NSClassFromString') {
-          return 'id myClass = NSClassFromString("ClassName");'
+          return 'id myClass = NSClassFromString(@"ClassName");'
         }
         else {
           return 'id myClass = objc_getClass("ClassName");'

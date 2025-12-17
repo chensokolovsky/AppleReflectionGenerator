@@ -12,7 +12,7 @@
             }
 
             const myRet = getObjCReturnType(ret)
-            const myPerform = getObjCPerformSelectorUpToTwo(num)
+            const myPerform = getObjCPerformSelectorUpToTwo(num, ptypes)
             return myRet + '[' + target + ' ' + myPerform
 
         }
@@ -252,10 +252,17 @@
         return 'ERROR!!!! unexptected return type selected!!!!! Error number: 101'
     }
 
-    function getObjCPerformSelectorUpToTwo(num) {
+    function getObjCPerformSelectorUpToTwo(num, ptypes) {
         if (num === 'none') return 'performSelector:mySelector];'
-        if (num === 'one') return 'performSelector:mySelector withObject:@"myFirstArg"];'
-        if (num === 'two') return 'performSelector:mySelector withObject:@"myFirstArg" withObject:@"mySecondArg"];'
+        if (num === 'one') {
+            if (ptypes === 'allNSObject') return 'performSelector:mySelector withObject:@"myFirstArg"];'
+            return 'performSelector:mySelector withObject:0.99];'
+        }
+        if (num === 'two') {
+            if (ptypes === 'allNSObject') return 'performSelector:mySelector withObject:@"myFirstArg" withObject:@"mySecondArg"];'
+            return 'performSelector:mySelector withObject:0.99 withObject:@"mySecondArg"];'
+
+        }
         return "ERROR!!!!! unexpected numer of args value up to two!!!!!!"
     }
 
@@ -396,10 +403,10 @@
     function getSwiftArgForImp(num, ptypes) {
         var result = '(AnyObject, Selector'
         if (num === 'none') return result + ')'
-        result += (ptypes === 'allNSObject') ? ', id' : ',Float'
+        result += (ptypes === 'allNSObject') ? ', AnyObject' : ', Float'
         if (num === 'one') return result + ')'
-        if (num === 'two') return result + ', id)'
-        return result + ', id, id)'
+        if (num === 'two') return result + ', AnyObject)'
+        return result + ', AnyObject, AnyObject)'
     }
 
 
